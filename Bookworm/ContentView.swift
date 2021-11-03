@@ -13,6 +13,16 @@ struct ContentView: View {
     
     @State private var showingAddScreen = false
     
+    func deleteBooks(at offsets: IndexSet) {
+        for offset in offsets {
+            let book = books[offset]
+            
+            moc.delete(book)
+        }
+        
+        try? moc.save()
+    }
+    
     var body: some View {
         NavigationView {
             List {
@@ -29,9 +39,10 @@ struct ContentView: View {
                         }
                     }
                 }
+                .onDelete(perform: deleteBooks)
             }
                 .navigationTitle("Bookworm")
-                .navigationBarItems(trailing: Button(action: {
+            .navigationBarItems(leading: EditButton(), trailing: Button(action: {
                     self.showingAddScreen.toggle()
                     
                 }){
