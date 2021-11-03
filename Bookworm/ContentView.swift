@@ -8,9 +8,40 @@
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(\.managedObjectContext) var moc
+    @FetchRequest(entity: Book.entity(), sortDescriptors: []) var books: FetchedResults<Book>
+    
+    @State private var showingAddScreen = false
+    
     var body: some View {
-        Text("Hello, world!")
-            .padding()
+        NavigationView {
+            List {
+                ForEach(books, id: \.self) { book in
+                    NavigationLink(destination: Text(book.title ?? "Unkniwn Title")) {
+                        EmojiRatingView(rating: book.rating)
+                            .font(.largeTitle)
+                        
+                        VStack(alignment: .leading) {
+                            Text(book.title ?? "Unkown Title")
+                                .font(.headline)
+                            Text(book.author ?? "Unknown Author")
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+            }
+                .navigationTitle("Bookworm")
+                .navigationBarItems(trailing: Button(action: {
+                    self.showingAddScreen.toggle()
+                    
+                }){
+                    Image(systemName: "plus")
+                })
+                .sheet(isPresented: $showingAddScreen) {
+                    AddBookView().environment(\.managedObjectContext, self.moc)
+                }
+            
+        }
     }
 }
 
